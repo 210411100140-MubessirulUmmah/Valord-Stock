@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Represents a single stock item (SKU).",
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "name": { "type": "string" },
+        "brand": { "type": "string" },
+        "category": { "type": "string" },
+        "size": { "type": "string" },
+        "price": { "type": "number" },
+        "totalIn": { "type": "number" },
+        "totalOut": { "type": "number" },
+        "stock": { "type": "number" },
+        "valueStock": { "type": "number" },
+        "reorderLevel": { "type": "number" },
+        "status": { "type": "string", "enum": ["OK", "LOW"] },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      },
+      "required": ["skuId", "name", "stock", "brand"]
+    },
+    "LedgerEntry": {
+      "title": "Ledger Entry",
+      "description": "A single transaction record for stock movement.",
+      "type": "object",
+      "properties": {
+        "skuId": { "type": "string" },
+        "productName": { "type": "string" },
+        "type": { "type": "string", "enum": ["IN", "OUT"] },
+        "quantity": { "type": "number" },
+        "channel": { "type": "string" },
+        "supplier": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "note": { "type": "string" }
+      },
+      "required": ["skuId", "type", "quantity", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of all products in inventory."
+    },
+    "/ledger/{entryId}": {
+      "schema": "LedgerEntry",
+      "description": "Audit trail of all stock movements."
+    }
+  }
+}

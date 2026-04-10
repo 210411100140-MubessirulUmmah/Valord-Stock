@@ -1,0 +1,60 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: products
+    // Fields:
+    //   - skuId: string (required)
+    //   - name: string (required)
+    //   - category: string
+    //   - size: string
+    //   - price: number
+    //   - stock: number (required)
+    //   - reorderLevel: number
+    //   - status: string (OK, LOW)
+    //   - lastUpdated: timestamp
+    //
+    // Collection: ledger
+    // Fields:
+    //   - skuId: string (required)
+    //   - type: string (IN, OUT)
+    //   - quantity: number (required)
+    //   - timestamp: timestamp (required)
+    //   - note: string
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidProduct(data) {
+      return data.skuId is string && data.skuId.size() > 0 &&
+             data.name is string && data.name.size() > 0 &&
+             data.stock is number;
+    }
+
+    function isValidLedger(data) {
+      return data.skuId is string &&
+             data.type in ['IN', 'OUT'] &&
+             data.quantity is number && data.quantity > 0;
+    }
+
+    match /products/{productId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidProduct(request.resource.data);
+      allow update: if isAuthenticated() && isValidProduct(request.resource.data);
+      allow delete: if isAuthenticated(); // In a real app, maybe only admins
+    }
+
+    match /ledger/{entryId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isValidLedger(request.resource.data);
+      allow update: if false; // Ledger entries should be immutable
+      allow delete: if false;
+    }
+  }
+}

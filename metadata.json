@@ -1,0 +1,5 @@
+{
+  "name": "Stock Ledger AI Automation",
+  "description": "Real-time stock tracking system with AI-powered inventory analysis, ledger audit trails, and low stock notifications.",
+  "requestFramePermissions": []
+}
